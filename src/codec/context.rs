@@ -41,9 +41,29 @@ impl Context {
         }
     }
 
+    pub fn new_with_codec(codec: &Codec) -> Self {
+        unsafe {
+            Context {
+                ptr: avcodec_alloc_context3(codec.as_ptr()),
+                owner: None,
+            }
+        }
+    }
+
     pub fn from_parameters<P: Into<Parameters>>(parameters: P) -> Result<Self, Error> {
         let parameters = parameters.into();
         let mut context = Self::new();
+
+        unsafe {
+            match avcodec_parameters_to_context(context.as_mut_ptr(), parameters.as_ptr()) {
+                e if e < 0 => Err(Error::from(e)),
+                _ => Ok(context),
+            }
+        }
+    }
+    pub fn from_parameters_with_codec<P: Into<Parameters>>(parameters: P, codec: &Codec) -> Result<Self, Error> {
+        let parameters = parameters.into();
+        let mut context = Self::new_with_codec(codec);
 
         unsafe {
             match avcodec_parameters_to_context(context.as_mut_ptr(), parameters.as_ptr()) {
