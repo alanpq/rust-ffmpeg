@@ -171,7 +171,18 @@ impl Audio {
             panic!("unsupported type");
         }
 
-        unsafe { slice::from_raw_parts((*self.as_ptr()).data[index] as *const T, self.samples()) }
+        if self.is_planar() {
+            unsafe {
+                slice::from_raw_parts((*self.as_ptr()).data[index] as *const T, self.samples())
+            }
+        } else {
+            unsafe {
+                slice::from_raw_parts(
+                    (*self.as_ptr()).data[0] as *const T,
+                    self.samples() * usize::from(self.channels()),
+                )
+            }
+        }
     }
 
     #[inline]
@@ -184,8 +195,20 @@ impl Audio {
             panic!("unsupported type");
         }
 
-        unsafe {
-            slice::from_raw_parts_mut((*self.as_mut_ptr()).data[index] as *mut T, self.samples())
+        if self.is_planar() {
+            unsafe {
+                slice::from_raw_parts_mut(
+                    (*self.as_mut_ptr()).data[index] as *mut T,
+                    self.samples(),
+                )
+            }
+        } else {
+            unsafe {
+                slice::from_raw_parts_mut(
+                    (*self.as_mut_ptr()).data[0] as *mut T,
+                    self.samples() * usize::from(self.channels()),
+                )
+            }
         }
     }
 
@@ -194,25 +217,22 @@ impl Audio {
         if index >= self.planes() {
             panic!("out of bounds");
         }
-
         unsafe {
             slice::from_raw_parts(
                 (*self.as_ptr()).data[index],
-                (*self.as_ptr()).linesize[index] as usize,
+                (*self.as_ptr()).linesize[0] as usize,
             )
         }
     }
-
     #[inline]
     pub fn data_mut(&mut self, index: usize) -> &mut [u8] {
         if index >= self.planes() {
             panic!("out of bounds");
         }
-
         unsafe {
             slice::from_raw_parts_mut(
                 (*self.as_mut_ptr()).data[index],
-                (*self.as_ptr()).linesize[index] as usize,
+                (*self.as_ptr()).linesize[0] as usize,
             )
         }
     }
