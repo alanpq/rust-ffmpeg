@@ -121,7 +121,12 @@ impl Input {
         }
     }
 
-    pub fn seek<R: Range<i64>>(&mut self, ts: i64, range: R) -> Result<(), Error> {
+    pub fn seek<R: Range<i64>>(
+        &mut self,
+        ts: i64,
+        range: R,
+        flags: libc::c_int,
+    ) -> Result<(), Error> {
         unsafe {
             match avformat_seek_file(
                 self.as_mut_ptr(),
@@ -129,7 +134,7 @@ impl Input {
                 range.start().cloned().unwrap_or(i64::min_value()),
                 ts,
                 range.end().cloned().unwrap_or(i64::max_value()),
-                0,
+                flags,
             ) {
                 s if s >= 0 => Ok(()),
                 e => Err(Error::from(e)),
