@@ -1,7 +1,7 @@
 use ffi::*;
 
 #[repr(transparent)]
-#[derive(Copy, Clone, PartialEq)]
+#[derive(Copy, Clone)]
 pub struct ChannelLayout(pub AVChannelLayout);
 
 impl PartialEq for ChannelLayout {
