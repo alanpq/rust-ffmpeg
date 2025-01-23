@@ -8,7 +8,7 @@ use ffi::AVSampleFormat::*;
 use ffi::*;
 use libc::{c_int, c_void};
 
-#[derive(Eq, PartialEq, Copy, Clone, Debug)]
+#[derive(Eq, Hash, PartialEq, Copy, Clone, Debug)]
 pub enum Sample {
     None,
 
@@ -20,7 +20,7 @@ pub enum Sample {
     F64(Type),
 }
 
-#[derive(Eq, PartialEq, Copy, Clone, Debug)]
+#[derive(Eq, Hash, PartialEq, Copy, Clone, Debug)]
 pub enum Type {
     Packed,
     Planar,
